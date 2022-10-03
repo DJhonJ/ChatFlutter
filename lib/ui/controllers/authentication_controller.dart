@@ -10,8 +10,7 @@ class AuthenticationController extends GetxController {
   // método usado para logearse en la aplicación
   Future<void> login(email, password) async {
     try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
       return Future.value();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -26,8 +25,7 @@ class AuthenticationController extends GetxController {
   Future<void> signup(email, password) async {
     try {
       // primero creamos el usuario en el sistema de autenticación de firebase
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
       UserController userController = Get.find();
 
