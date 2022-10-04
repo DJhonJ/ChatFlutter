@@ -1,12 +1,12 @@
 import 'dart:async';
-import 'package:f_chat_template/data/model/app_user.dart';
-import 'package:f_chat_template/ui/controllers/authentication_controller.dart';
-import 'package:f_chat_template/ui/controllers/user_controller.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
 
-import '../../data/model/message.dart';
+import 'package:f_chat_template/domain/app_user.dart';
+import 'authentication_controller.dart';
+import 'user_controller.dart';
+import 'package:f_chat_template/domain/message.dart';
 
 // En este controlador manejamos los mensajes entre el usuario logeado y el seleccionado
 class ChatController extends GetxController {
@@ -14,7 +14,7 @@ class ChatController extends GetxController {
   var messages = <Message>[].obs;
 
   // referencia a la base de datos
-  final databaseReference = FirebaseDatabase.instance.ref();
+  final databaseReference = FirebaseDatabase.instance.ref('messages');
 
   // stream de nuevas entradas
   late StreamSubscription<DatabaseEvent> newEntryStreamSubscription;
@@ -34,8 +34,16 @@ class ChatController extends GetxController {
     // TODO
     // newEntryStreamSubscription = databaseReference - child msg - child chatKey - listen
 
+    newEntryStreamSubscription = databaseReference.child(chatKey).onValue.listen((event) {
+      _onEntryAdded(event);
+    });
+
     // TODO
     //  updateEntryStreamSubscription = databaseReference - child msg - child chatKey - listen
+
+    updateEntryStreamSubscription = databaseReference.child(chatKey).onValue.listen((event) {
+      _onEntryChanged(event);
+    });
   }
 
   // método en el que cerramos los streams
@@ -47,7 +55,10 @@ class ChatController extends GetxController {
   // este método es llamado cuando se tiene una nueva entrada
   _onEntryAdded(DatabaseEvent event) {
     final json = event.snapshot.value as Map<dynamic, dynamic>;
-    messages.add(Message.fromJson(event.snapshot, json));
+
+    json.forEach((key, value) {
+      messages.add(Message.fromJson(event.snapshot, value));
+    });
   }
 
   // este método es llamado cuando hay un cambio es un mensaje
@@ -57,8 +68,7 @@ class ChatController extends GetxController {
     });
 
     final json = event.snapshot.value as Map<dynamic, dynamic>;
-    messages[messages.indexOf(oldEntry)] =
-        Message.fromJson(event.snapshot, json);
+    messages[messages.indexOf(oldEntry)] = Message.fromJson(event.snapshot, json);
   }
 
   // este método nos da la llave con la que localizamos la "tabla" de mensajes
@@ -74,7 +84,7 @@ class ChatController extends GetxController {
     String key = getChatKey(uidUser1, uidUser2);
     try {
       databaseReference
-          .child('msg')
+          //.child('msg')
           .child(key)
           .push()
           .set({'senderUid': senderUid, 'msg': msg});
@@ -90,9 +100,13 @@ class ChatController extends GetxController {
     AuthenticationController authenticationController = Get.find();
     String key = getChatKey(authenticationController.getUid(), remoteUserUid);
     String senderUid = authenticationController.getUid();
+
     try {
       // TODO
       // databaseReference - child('msg') - child(key) - push() - set({'senderUid': senderUid, 'msg': msg})
+      await databaseReference.child(key).push().set({'senderUid': senderUid, 'msg': msg});
+      //await databaseReference.child('msg').child(key).push().set({'senderUid': senderUid, 'msg': msg});
+
     } catch (error) {
       logError(error);
       return Future.error(error);

@@ -1,11 +1,12 @@
-import 'package:f_chat_template/ui/controllers/chat_controller.dart';
-import 'package:f_chat_template/ui/pages/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
-import '../../data/model/app_user.dart';
-import '../controllers/authentication_controller.dart';
-import '../controllers/user_controller.dart';
+
+import 'package:f_chat_template/domain/app_user.dart';
+import 'package:f_chat_template/framework/ui/controllers/chat_controller.dart';
+import 'package:f_chat_template/framework/ui/controllers/authentication_controller.dart';
+import 'package:f_chat_template/framework/ui/controllers/user_controller.dart';
+import 'chat_page.dart';
 
 // Widget donde se presentan los usuarios con los que se puede comenzar un chat
 class UserListPage extends StatefulWidget {

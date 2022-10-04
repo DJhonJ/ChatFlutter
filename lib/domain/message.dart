@@ -10,7 +10,7 @@ class Message {
   Message.fromJson(DataSnapshot snapshot, Map<dynamic, dynamic> json)
       : key = snapshot.key ?? "0",
         senderUid = json['senderUid'] ?? "senderUid",
-        msg = json['msg'] ?? "msg";
+        msg = json["msg"] ?? "msug";
 
   toJson() {
     return {

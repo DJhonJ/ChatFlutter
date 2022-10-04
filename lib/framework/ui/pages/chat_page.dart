@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
 
-import '../../data/model/message.dart';
+import 'package:f_chat_template/domain/message.dart';
 import '../controllers/authentication_controller.dart';
 import '../controllers/chat_controller.dart';
 
@@ -132,6 +132,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
+
     return Scaffold(
         appBar: AppBar(title: Text("Chat with $remoteEmail")),
         body: Padding(

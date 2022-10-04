@@ -10,7 +10,7 @@ class AuthenticationPage extends StatelessWidget {
   AuthenticationPage({Key? key}) : super(key: key);
   final AuthenticationController authenticationController = Get.find();
 
-  void signIn() async {
+  void signUp() async {
     // aquí creamos los tres usuarios
     await authenticationController.signup('a@a.com', '123456');
     await authenticationController.signup('b@b.com', '123456');
@@ -42,7 +42,7 @@ class AuthenticationPage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
-                          onPressed: signIn,
+                          onPressed: signUp,
                           child: const Text("Crear los tres usuarios"),
                         ),
                       ),

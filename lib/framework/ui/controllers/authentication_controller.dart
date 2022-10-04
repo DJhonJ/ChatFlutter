@@ -1,3 +1,5 @@
+import 'package:f_chat_template/injection_manual.dart';
+import 'package:f_chat_template/use_cases/login_usecase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
@@ -5,12 +7,14 @@ import 'user_controller.dart';
 
 // este controlador esconde los detalles de la implementación de firebase
 class AuthenticationController extends GetxController {
-  final databaseReference = FirebaseDatabase.instance.ref();
+  //final databaseReference = FirebaseDatabase.instance.ref();
+  final InjectionManual _injectionManual = InjectionManual();
 
   // método usado para logearse en la aplicación
   Future<void> login(email, password) async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      //await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      await _injectionManual.loginUseCase.invoke(email: email, password: password);
       return Future.value();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -27,11 +31,12 @@ class AuthenticationController extends GetxController {
       // primero creamos el usuario en el sistema de autenticación de firebase
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
-      UserController userController = Get.find();
+      //UserCredential userCredential = await _injectionManual.signupUseCase.invoke(email: email, password: password);
 
-      // después creamos el usuario en la base de datos de tiempo real usando el
-      // userController
+      //después creamos el usuario en la base de datos de tiempo real usando el userController
+      UserController userController = Get.find();
       await userController.createUser(email, userCredential.user!.uid);
+
       return Future.value();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

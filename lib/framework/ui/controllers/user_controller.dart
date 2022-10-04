@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
-import '../../data/model/app_user.dart';
+
+import 'package:f_chat_template/domain/app_user.dart';
 import 'authentication_controller.dart';
 
 // Controlador usado para manejar los usuarios del chat
@@ -21,23 +22,18 @@ class UserController extends GetxController {
   // puede comenzar una conversación
   get users {
     AuthenticationController authenticationController = Get.find();
-    return _users
-        .where((entry) => entry.uid != authenticationController.getUid())
-        .toList();
+
+    return _users.where((entry) => entry.uid != authenticationController.getUid()).toList();
   }
 
   get allUsers => _users;
 
-  // método para comenzar a escuchar cambios en la "tabla" userList de la base de
-  // datos
+  // método para comenzar a escuchar cambios en la "tabla" userList de la base de datos
   void start() {
     _users.clear();
 
-    newEntryStreamSubscription =
-        databaseRef.child("userList").onChildAdded.listen(_onEntryAdded);
-
-    updateEntryStreamSubscription =
-        databaseRef.child("userList").onChildChanged.listen(_onEntryChanged);
+    newEntryStreamSubscription = databaseRef.child("userList").onChildAdded.listen(_onEntryAdded);
+    updateEntryStreamSubscription = databaseRef.child("userList").onChildChanged.listen(_onEntryChanged);
   }
 
   // método para dejar de escuchar cambios

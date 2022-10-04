@@ -1,8 +1,9 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:loggy/loggy.dart';
-import 'config/configuration.dart';
-import 'ui/my_app.dart';
+
+import 'framework/config/configuration.dart';
+import 'framework/ui/my_app.dart';
 
 Future<void> main() async {
   // this is the key
@@ -20,10 +21,8 @@ Future<void> main() async {
         authDomain: Configuration.authDomain,
         databaseURL: Configuration.databaseURL,
         projectId: Configuration.projectId,
-        // storageBucket: Configuration.storageBucket,
         messagingSenderId: Configuration.messagingSenderId,
         appId: Configuration.appId,
-        // measurementId: Configuration.measurementId),
   ));
 
   runApp(const MyApp());
