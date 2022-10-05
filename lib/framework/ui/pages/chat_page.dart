@@ -60,7 +60,7 @@ class _ChatPageState extends State<ChatPage> {
       color: uid == element.senderUid ? Colors.yellow[200] : Colors.grey[300],
       child: ListTile(
         title: Text(
-          element.msg,
+          element.msg ?? "",
           textAlign:
               // cambiamos el textAlign dependiendo de quién mandó el usuario
               uid == element.senderUid ? TextAlign.right : TextAlign.left,

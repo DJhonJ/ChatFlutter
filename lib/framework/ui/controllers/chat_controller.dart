@@ -22,23 +22,25 @@ class ChatController extends GetxController {
   // stream de actualizaciones
   late StreamSubscription<DatabaseEvent> updateEntryStreamSubscription;
 
+  int _autoIdMessage = 0;
+
+  var _currentSnapshotMessage;
+
   // método en el que nos suscribimos  a los dos streams
   void subscribeToUpdated(uidUser) {
     messages.clear();
 
     // obtenemos la instancia del AuthenticationController
     AuthenticationController authenticationController = Get.find();
-
     String chatKey = getChatKey(authenticationController.getUid(), uidUser);
 
-    // TODO
+    // OK TODO
     // newEntryStreamSubscription = databaseReference - child msg - child chatKey - listen
-
     newEntryStreamSubscription = databaseReference.child(chatKey).onValue.listen((event) {
       _onEntryAdded(event);
     });
 
-    // TODO
+    // OK TODO
     //  updateEntryStreamSubscription = databaseReference - child msg - child chatKey - listen
 
     updateEntryStreamSubscription = databaseReference.child(chatKey).onValue.listen((event) {
@@ -48,17 +50,24 @@ class ChatController extends GetxController {
 
   // método en el que cerramos los streams
   void unsubscribe() {
-    //TODO
+    //OK. TODO
     // cancelar las subscripciones a los streams
+    updateEntryStreamSubscription.cancel();
+    newEntryStreamSubscription.cancel();
   }
 
   // este método es llamado cuando se tiene una nueva entrada
   _onEntryAdded(DatabaseEvent event) {
-    final json = event.snapshot.value as Map<dynamic, dynamic>;
-
-    json.forEach((key, value) {
-      messages.add(Message.fromJson(event.snapshot, value));
-    });
+    if (messages.isEmpty) {
+      for (var element in event.snapshot.children) {
+        messages.add(Message.fromJson2(element.key, element.value as Map<dynamic, dynamic>));
+      }
+    } else {
+      DataSnapshot lastMessage = event.snapshot.children.last;
+      if (messages.where((message) => message.key == lastMessage.key).isEmpty) {
+        messages.add(Message.fromJson2(lastMessage.key, lastMessage.value as Map<dynamic, dynamic>));
+      }
+    }
   }
 
   // este método es llamado cuando hay un cambio es un mensaje
@@ -84,10 +93,12 @@ class ChatController extends GetxController {
     String key = getChatKey(uidUser1, uidUser2);
     try {
       databaseReference
-          //.child('msg')
           .child(key)
+          //.child(_autoIdMessage.toString())
           .push()
-          .set({'senderUid': senderUid, 'msg': msg});
+          .set({'senderUid': senderUid, 'msg': msg, 'date': DateTime.now().toString()});
+
+      _autoIdMessage += 1;
     } catch (error) {
       logError(error);
       return Future.error(error);
@@ -102,11 +113,13 @@ class ChatController extends GetxController {
     String senderUid = authenticationController.getUid();
 
     try {
-      // TODO
+      // OK TODO
       // databaseReference - child('msg') - child(key) - push() - set({'senderUid': senderUid, 'msg': msg})
-      await databaseReference.child(key).push().set({'senderUid': senderUid, 'msg': msg});
-      //await databaseReference.child('msg').child(key).push().set({'senderUid': senderUid, 'msg': msg});
+      await databaseReference.child(key).push().set({'senderUid': senderUid, 'msg': msg, 'date': DateTime.now().toString()});
 
+      //await databaseReference.child(key).push().child(_autoIdMessage.toString()).set({'senderUid': senderUid, 'msg': msg, 'date': DateTime.now().toString()});
+      //await databaseReference.child('msg').child(key).push().set({'senderUid': senderUid, 'msg': msg});
+      _autoIdMessage += 1;
     } catch (error) {
       logError(error);
       return Future.error(error);
@@ -120,8 +133,10 @@ class ChatController extends GetxController {
     List<AppUser> users = userController.allUsers();
     createChat(users[0].uid, users[1].uid, users[0].uid, "Hola B, soy A");
     createChat(users[1].uid, users[0].uid, users[1].uid, "Hola A, cómo estás?");
+
     createChat(users[0].uid, users[2].uid, users[0].uid, "Hola C, soy A");
     createChat(users[0].uid, users[2].uid, users[2].uid, "Hola A, Cómo estás?");
+
     createChat(users[1].uid, users[2].uid, users[1].uid, "Hola C, soy B");
     createChat(users[2].uid, users[1].uid, users[2].uid, "Todo bien B");
   }

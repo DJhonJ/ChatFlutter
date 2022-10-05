@@ -10,10 +10,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //Get.put(ChatController());
-    //Get.put(AuthenticationController());
-    //Get.put(UserController());
-
     Get.lazyPut<AuthenticationController>(() => AuthenticationController());
     Get.lazyPut<ChatController>(() => ChatController());
     Get.lazyPut<UserController>(() => UserController());
