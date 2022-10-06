@@ -119,7 +119,7 @@ class ChatController extends GetxController {
 
       //await databaseReference.child(key).push().child(_autoIdMessage.toString()).set({'senderUid': senderUid, 'msg': msg, 'date': DateTime.now().toString()});
       //await databaseReference.child('msg').child(key).push().set({'senderUid': senderUid, 'msg': msg});
-      _autoIdMessage += 1;
+      //_autoIdMessage += 1;
     } catch (error) {
       logError(error);
       return Future.error(error);

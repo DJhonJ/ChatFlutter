@@ -1,15 +1,11 @@
-# f_chat_template
-
-Un template para una aplicación de chat usando la base de datos de tiempo real de firebase
-
-Video: https://youtu.be/B3SfN_NcBjk
-
-Funcional con Android y Web
+# Reto #3 Chat App
+Aplicación de chat en tiempo real usando firebase.
 
 
-![chat](https://user-images.githubusercontent.com/4458129/174921637-af104c0d-a64a-4625-b3af-9d4acd37cee5.gif)
+### Demo
+El siguiente enlace contiene un video de la aplicación en ejecución.
+https://drive.google.com/drive/u/0/folders/1xmrxBBEzhtOa0JiV11PGqPP23UNTMykI
 
-Solución:
-
-https://github.com/MisionTIC4b/f_chat
-
+#### Realizado por Grupo 6
+##### Integrantes
+- Jhon Jairo Diaz Matinez
