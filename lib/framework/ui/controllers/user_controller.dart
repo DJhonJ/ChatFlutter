@@ -10,11 +10,8 @@ import 'authentication_controller.dart';
 class UserController extends GetxController {
   // lista en la que se almacenan los uaurios, la misma es observada por la UI
   var _users = <AppUser>[].obs;
-
   final databaseRef = FirebaseDatabase.instance.ref();
-
   late StreamSubscription<DatabaseEvent> newEntryStreamSubscription;
-
   late StreamSubscription<DatabaseEvent> updateEntryStreamSubscription;
 
   // devolvemos a la UI todos los usuarios excepto el que está logeado en el sistema
@@ -23,10 +20,10 @@ class UserController extends GetxController {
   get users {
     AuthenticationController authenticationController = Get.find();
 
-    return _users.where((entry) => entry.uid != authenticationController.getUid()).toList();
+    return _users.where((entry) => entry.uid != authenticationController.getUid() && entry.email.toLowerCase() != authenticationController.userEmail().toLowerCase()).toList();
   }
 
-  get allUsers => _users;
+  List<AppUser> get allUsers => _users;
 
   // método para comenzar a escuchar cambios en la "tabla" userList de la base de datos
   void start() {
@@ -71,5 +68,9 @@ class UserController extends GetxController {
       logError(error);
       return Future.error(error);
     }
+  }
+
+  List<AppUser> getUsers(String email) {
+    return _users.where((entry) => entry.email.toLowerCase() != email.toLowerCase()).toList();
   }
 }

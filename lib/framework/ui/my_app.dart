@@ -1,3 +1,4 @@
+import 'package:f_chat_template/framework/ui/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controllers/authentication_controller.dart';
@@ -17,9 +18,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Firebase demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
+        theme: AppTheme.theme,
         home: const FirebaseCentral());
   }
 }

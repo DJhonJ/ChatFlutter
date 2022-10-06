@@ -5,6 +5,8 @@ import 'package:loggy/loggy.dart';
 import 'package:f_chat_template/domain/message.dart';
 import '../controllers/authentication_controller.dart';
 import '../controllers/chat_controller.dart';
+import '../themes/app_theme.dart';
+import '../widgets/message_widget.dart';
 
 // Widget con la interfaz del chat
 class ChatPage extends StatefulWidget {
@@ -17,6 +19,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   // controlador para el text input
   late TextEditingController _controller;
+
   // controlador para el sistema de scroll de la lista
   late ScrollController _scrollController;
   late String remoteUserUid;
@@ -54,24 +57,14 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _item(Message element, int posicion, String uid) {
-    return Card(
-      margin: const EdgeInsets.all(4.0),
-      // cambiamos el color dependiendo de quién mandó el usuario
-      color: uid == element.senderUid ? Colors.yellow[200] : Colors.grey[300],
-      child: ListTile(
-        title: Text(
-          element.msg ?? "",
-          textAlign:
-              // cambiamos el textAlign dependiendo de quién mandó el usuario
-              uid == element.senderUid ? TextAlign.right : TextAlign.left,
-        ),
-      ),
-    );
+    bool isSentMessage = uid == element.senderUid;
+    return MessageWidget(message: element, isSentMessage: isSentMessage);
   }
 
   Widget _list() {
     String uid = authenticationController.getUid();
     logInfo('Current user $uid');
+
     // Escuchamos la lista de mensajes entre los dos usuarios usando el ChatController
     return GetX<ChatController>(builder: (controller) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
@@ -88,38 +81,58 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _sendMsg(String text) async {
     // enviamos un nuevo mensaje usando el ChatController
-    logInfo("Calling _sendMsg with $text");
-    await chatController.sendChat(remoteUserUid, text);
+    if (text.isNotEmpty && text.trim().isNotEmpty) {
+      logInfo("Calling _sendMsg with $text");
+      await chatController.sendChat(remoteUserUid, text);
+    }
   }
 
   Widget _textInput() {
+    const OutlineInputBorder borderInput = OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.black26, width: 1.3),
+        borderRadius: BorderRadius.all(Radius.circular(50))
+    );
+
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Expanded(
-          flex: 3,
+          flex: 6,
           child: Container(
-            margin: const EdgeInsets.only(left: 5.0, top: 5.0),
+            margin: const EdgeInsets.only(top: 10.0),
             child: TextField(
+              style: TextStyle(height: 1.4, color: AppTheme.colorBlack),
               key: const Key('MsgTextField'),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Your message',
+              keyboardType: TextInputType.multiline,
+              minLines: 1,
+              maxLines: 3,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding:  const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+                focusedBorder: borderInput,
+                enabledBorder: borderInput,
+                border: borderInput,
+                hintText: "Escribe algo para $remoteEmail",
               ),
-              onSubmitted: (value) {
-                _sendMsg(_controller.text);
-                _controller.clear();
-              },
+              // onSubmitted: (value) {
+              //   _sendMsg(_controller.text);
+              //   _controller.clear();
+              // },
               controller: _controller,
             ),
           ),
         ),
-        TextButton(
-            key: const Key('sendButton'),
-            child: const Text('Send'),
-            onPressed: () {
-              _sendMsg(_controller.text);
-              _controller.clear();
-            })
+        Transform.scale(
+          scale: 1.3,
+          child: IconButton(
+              color: AppTheme.colorPrimary,
+              icon: const Icon(Icons.send_rounded),
+              onPressed: () {
+                _sendMsg(_controller.text);
+                _controller.clear();
+              }),
+        ),
       ],
     );
   }
@@ -136,9 +149,9 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
         appBar: AppBar(title: Text("Chat with $remoteEmail")),
         body: Padding(
-          padding: const EdgeInsets.fromLTRB(2.0, 2.0, 2.0, 25.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
-            children: [Expanded(flex: 4, child: _list()), _textInput()],
+            children: [Expanded(flex: 1, child: _list()), _textInput()],
           ),
         ));
   }

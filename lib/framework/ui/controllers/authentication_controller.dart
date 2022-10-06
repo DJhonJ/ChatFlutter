@@ -31,11 +31,14 @@ class AuthenticationController extends GetxController {
       // primero creamos el usuario en el sistema de autenticación de firebase
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
+      //await logout();
+
       //UserCredential userCredential = await _injectionManual.signupUseCase.invoke(email: email, password: password);
 
       //después creamos el usuario en la base de datos de tiempo real usando el userController
       UserController userController = Get.find();
       await userController.createUser(email, userCredential.user!.uid);
+
 
       return Future.value();
     } on FirebaseAuthException catch (e) {
@@ -57,7 +60,7 @@ class AuthenticationController extends GetxController {
   }
 
   String userEmail() {
-    String email = FirebaseAuth.instance.currentUser!.email ?? "a@a.com";
+    String email = FirebaseAuth.instance.currentUser!.email ?? "";
     return email;
   }
 

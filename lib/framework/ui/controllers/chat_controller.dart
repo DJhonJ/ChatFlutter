@@ -130,7 +130,8 @@ class ChatController extends GetxController {
   // de mensajes
   void initializeChats() {
     UserController userController = Get.find();
-    List<AppUser> users = userController.allUsers();
+    List<AppUser> users = userController.allUsers;
+
     createChat(users[0].uid, users[1].uid, users[0].uid, "Hola B, soy A");
     createChat(users[1].uid, users[0].uid, users[1].uid, "Hola A, cómo estás?");
 

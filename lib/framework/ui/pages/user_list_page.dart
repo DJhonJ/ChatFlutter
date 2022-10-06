@@ -6,6 +6,7 @@ import 'package:f_chat_template/domain/app_user.dart';
 import 'package:f_chat_template/framework/ui/controllers/chat_controller.dart';
 import 'package:f_chat_template/framework/ui/controllers/authentication_controller.dart';
 import 'package:f_chat_template/framework/ui/controllers/user_controller.dart';
+import '../themes/app_theme.dart';
 import 'chat_page.dart';
 
 // Widget donde se presentan los usuarios con los que se puede comenzar un chat
@@ -45,40 +46,43 @@ class _UserListPageState extends State<UserListPage> {
   }
 
   Widget _item(AppUser element) {
-    // Widget usado en la lista de los usuarios
-    // mostramos el correo y uid
+    // Widget usado en la lista de los usuarios  mostramos el correo y uid
     return Card(
-      margin: const EdgeInsets.all(4.0),
+      elevation: 0,
+      margin: EdgeInsets.zero,
       child: ListTile(
-        onTap: () {
-          Get.to(() => const ChatPage(), arguments: [
-            element.uid,
-            element.email,
-          ]);
-        },
-        title: Text(
-          element.email,
-        ),
-        subtitle: Text(element.uid),
+          onTap: () {
+            Get.to(() => const ChatPage(), arguments: [
+              element.uid,
+              element.email,
+            ]);
+          },
+          title: Text(element.email),
+          subtitle: Text(element.uid)
       ),
     );
   }
 
-  Widget _list() {
+  Widget _list(String currentEmail) {
     // Un widget con La lista de los usuarios con una validación para cuándo la misma este vacia
     // la lista de usuarios la obtenemos del userController
     return GetX<UserController>(builder: (controller) {
-      if (userController.users.length == 0) {
+      List<AppUser> users = controller.getUsers(currentEmail);
+
+      if (users.isEmpty) {
         return const Center(
-          child: Text('No users'),
+          child: Text('No hay usuarios.'),
         );
       }
+
       return ListView.builder(
-        itemCount: userController.users.length,
+        shrinkWrap: true,
+        itemCount: users.length,
         itemBuilder: (context, index) {
-          var element = userController.users[index];
+          var element = users[index];
           return _item(element);
         },
+        //separatorBuilder: (context, index) => const Divider(),
       );
     });
   }
@@ -86,23 +90,47 @@ class _UserListPageState extends State<UserListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Chat App ${authenticationController.userEmail()}"),
-          actions: [
-            // botón para crear unos chats para arrancar el demo
-            IconButton(
-                onPressed: () {
-                  chatController.initializeChats();
-                },
-                icon: const Icon(Icons.play_circle_outlined)),
-            // botón para cerrar la sesión con el usuario
-            IconButton(
-                icon: const Icon(Icons.exit_to_app),
-                onPressed: () {
-                  _logout();
-                }),
-          ],
-        ),
-        body: _list());
+      backgroundColor: AppTheme.colorGrey,
+      appBar: AppBar(
+        title: const Text("Chat App"),
+        elevation: 0,
+        actions: [
+          // botón para crear unos chats para arrancar el demo
+          IconButton(
+              onPressed: () {
+                chatController.initializeChats();
+              },
+              icon: const Icon(Icons.play_circle_outlined)),
+          // botón para cerrar la sesión con el usuario
+          IconButton(
+              icon: const Icon(Icons.exit_to_app),
+              onPressed: () {
+                _logout();
+              }),
+        ],
+      ),
+      body: SafeArea(
+          child: Column(
+            children: [
+              Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.only(left: 16.0, bottom: 20.0),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                          "Hola, ${authenticationController.userEmail()}",
+                          style: const TextStyle(fontSize: 20)))
+              ),
+              Flexible(
+                flex: 1,
+                child: Container(
+                    //padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    color: Colors.white,
+                    child: _list(authenticationController.userEmail())
+                ),
+              )
+            ],
+          )),
+    );
   }
 }
